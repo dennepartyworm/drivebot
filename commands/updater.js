@@ -12,7 +12,7 @@ const updateLength = 60 * 1000;
 var badgepoint = 0;
 var pokepoint = 0;
 //Literally I manually set this whenever I want them to do past events. Don't code like this
-var allpoint = 47;
+var allpoint = 49;
 
 
 var trimpoint = 0;
@@ -103,6 +103,7 @@ module.exports = {
 	async execute(interaction) {
 		if(interaction.user.id === authorId){
 			await interaction.reply({ content: 'Starting updater :)', ephemeral: true });
+		}
 
 
 	function sendMessage(wordsgohere){
@@ -146,72 +147,72 @@ module.exports = {
 
 
 //Notifies if we're in a battle.
-						var classname = "";
-						var trainername = "";
-						if(jsonData.enemy_trainers && jsonData.enemy_trainers.length > 0 && enemy_yes == 0){  // noncoli
-						//if(jsonData.in_battle && enemy_yes == 0){ //coli
-							enemy_yes = 1;
-							if(jsonData.enemy_trainers[0].class_name){
-								classname = jsonData.enemy_trainers[0].class_name;
-							}
-							if(jsonData.enemy_trainers[0].name){
-								trainername = jsonData.enemy_trainers[0].name;
-							}
-
-							//fix the PkMn characters
-							trainername = cleanName(trainername);
-							classname = cleanName(classname);
-
-							msg = '🆚 Battle: '+classname;
-							if(classname != trainername){
-								msg = msg+' '+trainername; //so that gen 1 doesn't say BRUNO BRUNO
-							}
-							if(elitefourlocs.includes(jsonData.map_name) && elitefourWIP == 0){ //E4 attempt counter for gens with set E4 order (there's probably a way to do the other gens but I'm lazy)
-								elitefourWIP = 1;
-								attempts++;
-								msg = msg+' (Attempt #'+attempts+')';
-							}
-							msg = msg+'.\n';
-
+					var classname = "";
+					var trainername = "";
+					if(jsonData.enemy_trainers && jsonData.enemy_trainers.length > 0 && enemy_yes == 0){  // noncoli
+					//if(jsonData.in_battle && enemy_yes == 0){ //coli
+						enemy_yes = 1;
+						if(jsonData.enemy_trainers[0].class_name){
+							classname = jsonData.enemy_trainers[0].class_name;
 						}
-						if(!jsonData.enemy_trainers){
-						 	enemy_yes = 0;
-						 } //noncoli
-
-						//if(!jsonData.in_battle){ //coli
-							//enemy_yes = 0;
-						//}
-
-						if(msg !=""){
-							sendMessage(msg);
-							fs.appendFile(file, msg, (err) => {
-								if (err) {
-   									console.error(err);
-									return;
- 								}
-							});
+						if(jsonData.enemy_trainers[0].name){
+							trainername = jsonData.enemy_trainers[0].name;
 						}
+
+						//fix the PkMn characters
+						trainername = cleanName(trainername);
+						classname = cleanName(classname);
+
+						msg = '🆚 Battle: '+classname;
+						if(classname != trainername){
+							msg = msg+' '+trainername; //so that gen 1 doesn't say BRUNO BRUNO
+						}
+						if(elitefourlocs.includes(jsonData.map_name) && elitefourWIP == 0){ //E4 attempt counter for gens with set E4 order (there's probably a way to do the other gens but I'm lazy)
+							elitefourWIP = 1;
+							attempts++;
+							msg = msg+' (Attempt #'+attempts+')';
+						}
+						msg = msg+'.\n';
+
+					}
+					if(!jsonData.enemy_trainers){
+					 	enemy_yes = 0;
+					 } //noncoli
+
+					//if(!jsonData.in_battle){ //coli
+						//enemy_yes = 0;
+					//}
+
+					if(msg !=""){
+						sendMessage(msg);
+						fs.appendFile(file, msg, (err) => {
+							if (err) {
+									console.error(err);
+								return;
+								}
+						});
+					}
 
 //Notifies when our ball count changes (lol).
-						if(!jsonData.ball_count && buals != 0){
-							sendMessage('🍚 We now have 0 Pok\u{00E9} Balls.');
-							buals = 0;
+					if(!jsonData.ball_count && buals != 0){
+						sendMessage('🍚 We now have 0 Pok\u{00E9} Balls.');
+						buals = 0;
+					}
+					if(jsonData.ball_count && jsonData.ball_count != buals){
+						curmsg = '🍚 We now have '+jsonData.ball_count+' Pok\u{00E9} Ball';
+						if(jsonData.ball_count != 1){
+							curmsg = curmsg+"s";
 						}
-						if(jsonData.ball_count && jsonData.ball_count != buals){
-							curmsg = '🍚 We now have '+jsonData.ball_count+' Pok\u{00E9} Ball';
-							if(jsonData.ball_count != 1){
-								curmsg = curmsg+"s";
-							}
-							curmsg = curmsg+".\n";
-							sendMessage(curmsg);
-							fs.appendFile(file, curmsg, (err) => {
-								if (err) {
-   									console.error(err);
-									return;
- 								}
-							});
+						curmsg = curmsg+".\n";
+						sendMessage(curmsg);
+						fs.appendFile(file, curmsg, (err) => {
+							if (err) {
+									console.error(err);
+								return;
+								}
+						});
 
-							buals = jsonData.ball_count;
+						buals = jsonData.ball_count;
 
 //Detects new mon in the PC.
 //TODO: report when a mon leaves the PC
@@ -220,104 +221,210 @@ module.exports = {
 //since it's still in the PVs
 //Kinda cursed tbh
 
-						msg = "";
-						curmsg = "";
-						//if you don't have the correct box quantity set that and come back
-						//this happens when first booting up, or if new boxes show up? which happens sometimes?
-						if(jsonData.pc.boxes == null){
-							console.log("pc is null rn pls wait");
-							return;
-						}
-						//When you're just starting up, pcboxes and pcboxcount will be [] and 0
-						if(pcboxes.length != jsonData.pc.boxes.length && pcboxcount == 0){
-							pcboxes = jsonData.pc.boxes;
-							console.log("pc boxes = "+pcboxes.length);
 
-							for(i = 0; i < jsonData.pc.boxes.length; i++){
-								for(j = 0; j < jsonData.pc.boxes[i].box_contents.length; j++){
-									var currentpv = jsonData.pc.boxes[i].box_contents[j].personality_value;
-									console.log(currentpv);
-									pc_pvs.push(currentpv);
-								}
+					msg = "";
+					curmsg = "";
+					//if you don't have the correct box quantity set that and come back
+					//this happens when first booting up, or if new boxes show up? which happens sometimes?
+					if(jsonData.pc.boxes == null){
+						console.log("pc is null rn pls wait");
+						return;
+					}
+					//When you're just starting up, pcboxes and pcboxcount will be [] and 0
+					if(pcboxes.length != jsonData.pc.boxes.length && pcboxcount == 0){
+						pcboxes = jsonData.pc.boxes;
+						console.log("pc boxes = "+pcboxes.length);
+
+						for(i = 0; i < jsonData.pc.boxes.length; i++){
+							for(j = 0; j < jsonData.pc.boxes[i].box_contents.length; j++){
+								var currentpv = jsonData.pc.boxes[i].box_contents[j].personality_value;
+								console.log(currentpv);
+								pc_pvs.push(currentpv);
 							}
-							console.log('pvs:\n'+pc_pvs);
-							pcboxcount = jsonData.pc.boxes.length;
-
-
-							return;
 						}
+						console.log('pvs:\n'+pc_pvs);
+						pcboxcount = jsonData.pc.boxes.length;
+					}
 
-						if(pcboxes.length != jsonData.pc.boxes.length && pcboxcount != 0){
-							console.log("Detected a new box.");
-							for(i = pcboxcount; i < jsonData.pc.boxes.length; i++){
-								for(j = 0; j < jsonData.pc.boxes[i].box_contents.length; j++){
-									var currentmon = jsonData.pc.boxes[i].box_contents[j];
-									pc_pvs.push(currentmon.personality_value);
-								}
-							}
-							pcboxcount = jsonData.pc.boxes.length;
-							pcboxes = jsonData.pc.boxes;
-							console.log("pc boxes now = "+pcboxes.length);
-							console.log('pvs now\n'+pc_pvs);
-						}
-
-						//Detect if a new mon has been added to the PC.
-						curmsg = "";
-						var current_pvs = [];
-						for(i = 0; i < jsonData.pc.boxes.length; i++){ 
+					if(pcboxes.length != jsonData.pc.boxes.length && pcboxcount != 0){
+						console.log("Detected a new box.");
+						for(i = pcboxcount; i < jsonData.pc.boxes.length; i++){
 							for(j = 0; j < jsonData.pc.boxes[i].box_contents.length; j++){
 								var currentmon = jsonData.pc.boxes[i].box_contents[j];
-								current_pvs.push(currentmon.personality_value);
-								if(!pc_pvs.includes(currentmon.personality_value)){
-									console.log("New mon detected.");
-									curmsg = curmsg+'🖥️ New Pok\u{00E9}mon in box '+jsonData.pc.boxes[i].box_number+': __'; //🪦🖥️
-									var curname = cleanName(currentmon.name);
-									curmsg = curmsg+curname+'__, Lv.'+currentmon.level+' '+currentmon.species.name+'.\n';
-									pc_pvs.push(currentmon.personality_value);
-									pc_didweswitchgame++;
-								}
+								pc_pvs.push(currentmon.personality_value);
 							}
 						}
-						//console.log('current pvs: '+current_pvs);
-
-						// var old_pvs = []; //test
-
-
-						//Detect if a mon is missing from the PC.
-						for(i = 0; i < pcboxes.length; i++){
-
-							for(j = 0; j < pcboxes[i].box_contents.length; j++){
-								var currentmon = pcboxes[i].box_contents[j];
-								// old_pvs.push(currentmon.personality_value); //test
-								if(!current_pvs.includes(currentmon.personality_value)){
-									console.log("Mon missing?");
-									curmsg = curmsg+'🖥️📤 Pok\u{00E9}mon has left box '+pcboxes[i].box_number+'?: __'; //👻🖥️📤
-									curmsg = curmsg+currentmon.name+'__, Lv. '+currentmon.level+' '+currentmon.species.name+'.\n';
-									var temparray = pc_pvs.filter(function(pv){
-										return pv != currentmon.personality_value;
-									});
-									pc_pvs = temparray;
-									pc_didweswitchgame++;
-								}
-							} 
-							
-						}
-
-						// console.log('old pvs: '+old_pvs);
-						// console.log('final pvs: '+pc_pvs);
-
+						pcboxcount = jsonData.pc.boxes.length;
 						pcboxes = jsonData.pc.boxes;
+						console.log("pc boxes now = "+pcboxes.length);
+						console.log('pvs now\n'+pc_pvs);
+					}
 
-	
-						//If too many pokemon appear/disappear at once,
-						//Something's Clearly Up, so don't send the message.
-						//Increase this if we play a game with a mass release option.
-						if(pc_didweswitchgame >= 5){
-							curmsg = "";
+					//Detect if a new mon has been added to the PC.
+					curmsg = "";
+					var current_pvs = [];
+					for(i = 0; i < jsonData.pc.boxes.length; i++){ 
+						for(j = 0; j < jsonData.pc.boxes[i].box_contents.length; j++){
+							var currentmon = jsonData.pc.boxes[i].box_contents[j];
+							current_pvs.push(currentmon.personality_value);
+							if(!pc_pvs.includes(currentmon.personality_value)){
+								console.log("New mon detected.");
+								curmsg = curmsg+'🖥️ New Pok\u{00E9}mon in box '+jsonData.pc.boxes[i].box_number+': __'; //🪦🖥️
+								var curname = cleanName(currentmon.name);
+								curmsg = curmsg+curname+'__, Lv.'+currentmon.level+' '+currentmon.species.name+'.\n';
+								pc_pvs.push(currentmon.personality_value);
+								pc_didweswitchgame++;
+							}
 						}
+					}
+					//console.log('current pvs: '+current_pvs);
 
-						pc_didweswitchgame = 0;
+					// var old_pvs = []; //test
+
+
+					//Detect if a mon is missing from the PC.
+					for(i = 0; i < pcboxes.length; i++){
+
+						for(j = 0; j < pcboxes[i].box_contents.length; j++){
+							var currentmon = pcboxes[i].box_contents[j];
+							// old_pvs.push(currentmon.personality_value); //test
+							if(!current_pvs.includes(currentmon.personality_value)){
+								console.log("Mon missing?");
+								curmsg = curmsg+'🖥️📤 Pok\u{00E9}mon has left box '+pcboxes[i].box_number+'?: __'; //👻🖥️📤
+								curmsg = curmsg+currentmon.name+'__, Lv. '+currentmon.level+' '+currentmon.species.name+'.\n';
+								var temparray = pc_pvs.filter(function(pv){
+									return pv != currentmon.personality_value;
+								});
+								pc_pvs = temparray;
+								pc_didweswitchgame++;
+							}
+						} 
 						
+					}
+
+					// console.log('old pvs: '+old_pvs);
+					// console.log('final pvs: '+pc_pvs);
+
+					pcboxes = jsonData.pc.boxes;
+
+
+					//If too many pokemon appear/disappear at once,
+					//Something's Clearly Up, so don't send the message.
+					//Increase this if we play a game with a mass release option.
+					if(pc_didweswitchgame >= 5){
+						curmsg = "";
+					}
+
+					pc_didweswitchgame = 0;
+					
+					if(curmsg !=""){
+						sendMessage(curmsg);
+						fs.appendFile(file, curmsg, (err) => {
+							if (err) {
+									console.error(err);
+								return;
+								}
+						});
+					}
+
+
+
+//Notifies when our party changes. Currently this works by checking if the personality values (unique) or species in the party have changed.
+//It then just posts the whole party because idk how to do it better right now.
+//Figure out how to update on level up too please
+					partychange = 0;
+					msg = "";
+					curmsg = "";
+
+					if(curparty.length === 0 && jsonData.party.length > 0){
+						for(i = 0; i < jsonData.party.length; i++){
+							curparty[i] = {};
+							curparty[i].name = jsonData.party[i].name;
+							curparty[i].level = jsonData.party[i].level;
+							curparty[i].species = jsonData.party[i].species.name;
+							curparty[i].personality = jsonData.party[i].personality_value;
+							pvs[i] = jsonData.party[i].personality_value;
+							specy[i] = jsonData.party[i].species.name;
+
+						}
+						partyfull = jsonData.party;
+					}
+					for(i = 0; i < jsonData.party.length; i++){
+						if(!pvs.includes(jsonData.party[i].personality_value) || !specy.includes(jsonData.party[i].species.name) || jsonData.party.length != pvs.length){
+							if(!locs2calmdownabout.includes(jsonData.map_name)){
+								partychange = 1;
+								console.log("what");
+							}
+						}
+					}
+					if(partychange === 1){
+						console.log('party change...');
+						curmsg = '✍️ Our party looks different now...\n        Current party: '
+						for(i = 0; i < jsonData.party.length; i++){
+							var curname = cleanName(jsonData.party[i].name);
+							curmsg = curmsg.concat("__"+curname+"__, Lv. "+jsonData.party[i].level+" "+jsonData.party[i].species.name);
+							if(i < jsonData.party.length-1){
+								curmsg = curmsg.concat(" | ");
+							}
+						}
+						curmsg.concat("\n");
+						if(curmsg !=""){
+							sendMessage(curmsg);
+							fs.appendFile(file, curmsg, (err) => {
+							if (err) {
+									console.error(err);
+								return;
+								}
+						});
+						}
+						curparty = [];
+						pvs = [];
+						specy = [];
+						for(i = 0; i < jsonData.party.length; i++){
+							curparty.push(jsonData.party[i].species.name);
+							pvs.push(jsonData.party[i].personality_value);
+							specy.push(jsonData.party[i].species.name);
+						}
+						partyfull = jsonData.party;
+					}
+
+
+//WIP: daycare code
+//same as the party code basically						
+					daycarechange = 0;
+					msg = "";
+					curmsg = "";
+
+					if(curdaycare.length === 0 && jsonData.daycare.length > 0){
+						for(i = 0; i < jsonData.daycare.length; i++){
+							curdaycare[i] = {};
+							curdaycare[i].name = jsonData.daycare[i].name;
+							curdaycare[i].level = jsonData.daycare[i].level;
+							curdaycare[i].species = jsonData.daycare[i].species.name;
+							curdaycare[i].personality = jsonData.daycare[i].personality_value;
+							daycarepvs[i] = jsonData.daycare[i].personality_value;
+							daycarespecy[i] = jsonData.daycare[i].species.name;
+
+						}
+						daycarefull = jsonData.daycare;
+						console.log(curdaycare);
+					}
+					for(i = 0; i < jsonData.daycare.length; i++){
+						if(!daycarepvs.includes(jsonData.daycare[i].personality_value) || !daycarespecy.includes(jsonData.daycare[i].species.name) || jsonData.daycare.length != daycarepvs.length){
+							daycarechange = 1;
+							console.log("what");
+						}
+					}
+					if(daycarechange === 1){
+						console.log('daycare change...');
+						curmsg = '🥚 Current daycare: '
+						for(i = 0; i < jsonData.daycare.length; i++){
+							var curname = cleanName(jsonData.daycare[i].name);
+							curmsg = curmsg.concat("__"+curname+"__, Lv. "+jsonData.daycare[i].level+" "+jsonData.daycare[i].species.name);
+							if(i < jsonData.daycare.length-1){
+								curmsg = curmsg.concat(" | ");
+							}
+						}
 						if(curmsg !=""){
 							sendMessage(curmsg);
 							fs.appendFile(file, curmsg, (err) => {
@@ -327,257 +434,146 @@ module.exports = {
  								}
 							});
 						}
-						
-
-
-
-//Notifies when our party changes. Currently this works by checking if the personality values (unique) or species in the party have changed.
-//It then just posts the whole party because idk how to do it better right now.
-//Figure out how to update on level up too please
-						partychange = 0;
-						msg = "";
-						curmsg = "";
-
-						if(curparty.length === 0 && jsonData.party.length > 0){
-							for(i = 0; i < jsonData.party.length; i++){
-								curparty[i] = {};
-								curparty[i].name = jsonData.party[i].name;
-								curparty[i].level = jsonData.party[i].level;
-								curparty[i].species = jsonData.party[i].species.name;
-								curparty[i].personality = jsonData.party[i].personality_value;
-								pvs[i] = jsonData.party[i].personality_value;
-								specy[i] = jsonData.party[i].species.name;
-
-							}
-							partyfull = jsonData.party;
-							return;
-						}
-						for(i = 0; i < jsonData.party.length; i++){
-							if(!pvs.includes(jsonData.party[i].personality_value) || !specy.includes(jsonData.party[i].species.name) || jsonData.party.length != pvs.length){
-								if(!locs2calmdownabout.includes(jsonData.map_name)){
-									partychange = 1;
-									console.log("what");
-								}
-							}
-						}
-						if(partychange === 1){
-							console.log('party change...');
-							curmsg = '✍️ Our party looks different now...\n        Current party: '
-							for(i = 0; i < jsonData.party.length; i++){
-								var curname = cleanName(jsonData.party[i].name);
-								curmsg = curmsg.concat("__"+curname+"__, Lv. "+jsonData.party[i].level+" "+jsonData.party[i].species.name);
-								if(i < jsonData.party.length-1){
-									curmsg = curmsg.concat(" | ");
-								}
-							}
-							curmsg.concat("\n");
-							if(curmsg !=""){
-								sendMessage(curmsg);
-								fs.appendFile(file, curmsg, (err) => {
-								if (err) {
-   									console.error(err);
-									return;
- 								}
-							});
-							}
-							curparty = [];
-							pvs = [];
-							specy = [];
-							for(i = 0; i < jsonData.party.length; i++){
-								curparty.push(jsonData.party[i].species.name);
-								pvs.push(jsonData.party[i].personality_value);
-								specy.push(jsonData.party[i].species.name);
-							}
-							partyfull = jsonData.party;
-						}
-
-
-//WIP: daycare code
-//same as the party code basically						
-						daycarechange = 0;
-						msg = "";
-						curmsg = "";
-
-						if(curdaycare.length === 0 && jsonData.daycare.length > 0){
-							for(i = 0; i < jsonData.daycare.length; i++){
-								curdaycare[i] = {};
-								curdaycare[i].name = jsonData.daycare[i].name;
-								curdaycare[i].level = jsonData.daycare[i].level;
-								curdaycare[i].species = jsonData.daycare[i].species.name;
-								curdaycare[i].personality = jsonData.daycare[i].personality_value;
-								daycarepvs[i] = jsonData.daycare[i].personality_value;
-								daycarespecy[i] = jsonData.daycare[i].species.name;
-
-							}
-							daycarefull = jsonData.daycare;
-							console.log(curdaycare);
-							return;
-						}
+						curdaycare = [];
+						daycarepvs = [];
+						daycarespecy = [];
 						for(i = 0; i < jsonData.daycare.length; i++){
-							if(!daycarepvs.includes(jsonData.daycare[i].personality_value) || !daycarespecy.includes(jsonData.daycare[i].species.name) || jsonData.daycare.length != daycarepvs.length){
-								daycarechange = 1;
-								console.log("what");
-							}
+							curdaycare.push(jsonData.daycare[i].species.name);
+							daycarepvs.push(jsonData.daycare[i].personality_value);
+							daycarespecy.push(jsonData.daycare[i].species.name);
 						}
-						if(daycarechange === 1){
-							console.log('daycare change...');
-							curmsg = '🥚 Current daycare: '
-							for(i = 0; i < jsonData.daycare.length; i++){
-								var curname = cleanName(jsonData.daycare[i].name);
-								curmsg = curmsg.concat("__"+curname+"__, Lv. "+jsonData.daycare[i].level+" "+jsonData.daycare[i].species.name);
-								if(i < jsonData.daycare.length-1){
-									curmsg = curmsg.concat(" | ");
-								}
-							}
-							if(curmsg !=""){
-								sendMessage(curmsg);
-								fs.appendFile(file, curmsg, (err) => {
-									if (err) {
-	   									console.error(err);
-										return;
-	 								}
-								});
-							}
-							curdaycare = [];
-							daycarepvs = [];
-							daycarespecy = [];
-							for(i = 0; i < jsonData.daycare.length; i++){
-								curdaycare.push(jsonData.daycare[i].species.name);
-								daycarepvs.push(jsonData.daycare[i].personality_value);
-								daycarespecy.push(jsonData.daycare[i].species.name);
-							}
-							daycarefull = jsonData.daycare;
-						}
+						daycarefull = jsonData.daycare;
+					}
 
 //Notifies when we walky
-						if(!(jsonData.map_name === wherearewe)){
-							var testloc = jsonData.map_name;
-							// if(testloc === ''){
-							// 	testloc.concat('Probably a contest'); //RTHE
-							// }
-							msg = '🚶 Current location: '+testloc+'.\n';
-							sendMessage(msg);
-							wherearewe = jsonData.map_name;
-							fs.appendFile(file, msg, (err) => {
-								if (err) {
-   									console.error(err);
-									return;
- 								}
-							});
-							msg = "";
-						}
+					if(!(jsonData.map_name === wherearewe)){
+						var testloc = jsonData.map_name;
+						// if(testloc === ''){
+						// 	testloc.concat('Probably a contest'); //RTHE
+						// }
+						msg = '🚶 Current location: '+testloc+'.\n';
+						sendMessage(msg);
+						wherearewe = jsonData.map_name;
+						fs.appendFile(file, msg, (err) => {
+							if (err) {
+									console.error(err);
+								return;
+								}
+						});
+						msg = "";
+					}
 //Notifies when we monie
-						if(!(jsonData.money === monies)){
-							msg = '💸 We now have '+jsonData.money+' Pok\u{00E9}yen.\n';
-							sendMessage(msg);
-							if(elitefourWIP == 1 && jsonData.money < monies){
-								elitefourWIP = 0;
-								console.log("E4 attempt "+attempts+" over");
-							}
-							monies = jsonData.money;
-							fs.appendFile(file, msg, (err) => {
-								if (err) {
-   									console.error(err);
-									return;
- 								}
-							});
-							msg = "";
+					if(!(jsonData.money === monies)){
+						msg = '💸 We now have '+jsonData.money+' Pok\u{00E9}yen.\n';
+						sendMessage(msg);
+						if(elitefourWIP == 1 && jsonData.money < monies){
+							elitefourWIP = 0;
+							console.log("E4 attempt "+attempts+" over");
 						}
+						monies = jsonData.money;
+						fs.appendFile(file, msg, (err) => {
+							if (err) {
+									console.error(err);
+								return;
+								}
+						});
+						msg = "";
+					}
 
 
 //RTHE
-						// if(ribbons == 0){
-						// 	ribbons = jsonData.game_stats["Ribbons Earned"];
-						// }
-						// if(contests_won == 0){
-						// 	contests_won = jsonData.game_stats["Contests Won"];
-						// }
-						// if(!(jsonData.game_stats["Ribbons Earned"] === ribbons)){
-						// 	sendMessage('🎀 Earned a ribbon! We\'ve now earned '+jsonData.game_stats["Ribbons Earned"]+'.\n');
-						// 	ribbons = jsonData.game_stats["Ribbons Earned"];
-						// }
-						// if(!(jsonData.game_stats["Contests Won"] === contests_won)){
-						// 	sendMessage('👒 Won a contest! We\'ve now won '+jsonData.game_stats["Contests Won"]+'.\n');
-						// 	contests_won = jsonData.game_stats["Contests Won"];
-						// }
+					// if(ribbons == 0){
+					// 	ribbons = jsonData.game_stats["Ribbons Earned"];
+					// }
+					// if(contests_won == 0){
+					// 	contests_won = jsonData.game_stats["Contests Won"];
+					// }
+					// if(!(jsonData.game_stats["Ribbons Earned"] === ribbons)){
+					// 	sendMessage('🎀 Earned a ribbon! We\'ve now earned '+jsonData.game_stats["Ribbons Earned"]+'.\n');
+					// 	ribbons = jsonData.game_stats["Ribbons Earned"];
+					// }
+					// if(!(jsonData.game_stats["Contests Won"] === contests_won)){
+					// 	sendMessage('👒 Won a contest! We\'ve now won '+jsonData.game_stats["Contests Won"]+'.\n');
+					// 	contests_won = jsonData.game_stats["Contests Won"];
+					// }
 
 //Badges. Temporary
-						// if(!(jsonData.badges === badges)){
-						// 	if(badges === 0){
-						// 		badges = jsonData.badges;
-						// 	}else{
-						// 		curmsg = '🏆 Got the badge from '+jsonData.map_name+'!';
-						// 		sendMessage(curmsg);
-						// 		badges = jsonData.badges;
-						// 	}
-						// }
+					// if(!(jsonData.badges === badges)){
+					// 	if(badges === 0){
+					// 		badges = jsonData.badges;
+					// 	}else{
+					// 		curmsg = '🏆 Got the badge from '+jsonData.map_name+'!';
+					// 		sendMessage(curmsg);
+					// 		badges = jsonData.badges;
+					// 	}
+					// }
 //Caught list. Temporary
-						// if(caught === []){
-						// 	caught = jsonData.caught_list;
-						// 	console.log(caught);
-						// 	return;
-						// }
-						// if(!(jsonData.caught_list === caught)){
-						// 	curmsg = "";
-						// 	for(i = 0; i < jsonData.caught_list.length; i++){
-						// 	if(!caught.includes(jsonData.caught_list[i])){
-						// 		curmsg = curmsg+"🔢 New Pok\u{00E9}mon caught: "+jsonData.caught_list[i]+'.\n';
-						// 	}
-						// }
-						// 	caught = jsonData.caught_list;
-						// 	if(curmsg !=""){
-						// 	sendMessage(curmsg);
-						// 	}
-							
-						// }
+					// if(caught === []){
+					// 	caught = jsonData.caught_list;
+					// 	console.log(caught);
+					// 	return;
+					// }
+					// if(!(jsonData.caught_list === caught)){
+					// 	curmsg = "";
+					// 	for(i = 0; i < jsonData.caught_list.length; i++){
+					// 	if(!caught.includes(jsonData.caught_list[i])){
+					// 		curmsg = curmsg+"🔢 New Pok\u{00E9}mon caught: "+jsonData.caught_list[i]+'.\n';
+					// 	}
+					// }
+					// 	caught = jsonData.caught_list;
+					// 	if(curmsg !=""){
+					// 	sendMessage(curmsg);
+					// 	}
+						
+					// }
 //Wild battle message for if we're fighting a legendary or a shiny
-						if(jsonData.battle_kind == "Wild" && jsonData.enemy_party && jsonData.enemy_party.length > 0 && legend_yes == 0 && legendaries.includes(jsonData.enemy_party[0].species.name)){
-							for(i = 0; i < jsonData.enemy_party.length; i++){
-								if(legendaries.includes(jsonData.enemy_party[i].species.name)){
-									legend_yes = 1;
-								}
+					if(jsonData.battle_kind == "Wild" && jsonData.enemy_party && jsonData.enemy_party.length > 0 && legend_yes == 0 && legendaries.includes(jsonData.enemy_party[0].species.name)){
+						for(i = 0; i < jsonData.enemy_party.length; i++){
+							if(legendaries.includes(jsonData.enemy_party[i].species.name)){
+								legend_yes = 1;
 							}
-							msg = '😎 Battling against a wild ';
-							for(i = 0; i < jsonData.enemy_party.length; i++){
-								msg = msg.concat(jsonData.enemy_party[i].species.name);
-								if(i < jsonData.enemy_party.length-1){
-									msg = msg.concat(' and ');
-								}
+						}
+						msg = '😎 Battling against a wild ';
+						for(i = 0; i < jsonData.enemy_party.length; i++){
+							msg = msg.concat(jsonData.enemy_party[i].species.name);
+							if(i < jsonData.enemy_party.length-1){
+								msg = msg.concat(' and ');
 							}
-							msg = msg.concat('.');
-							
 						}
-						if(!jsonData.enemy_party){
-							legend_yes = 0;
-							//console.log("legend_yes "+legend_yes)
-						}
-						if(msg !=""){
-							sendMessage(msg);
-							fs.appendFile(file, msg, (err) => {
-								if (err) {
-   									console.error(err);
-									return;
- 								}
-							});
-						}
-						msg = "";
+						msg = msg.concat('.');
+						
+					}
+					if(!jsonData.enemy_party){
+						legend_yes = 0;
+						//console.log("legend_yes "+legend_yes)
+					}
+					if(msg !=""){
+						sendMessage(msg);
+						fs.appendFile(file, msg, (err) => {
+							if (err) {
+									console.error(err);
+								return;
+								}
+						});
+					}
+					msg = "";
 //this is not efficient
 					if(jsonData.battle_kind == "Wild" && jsonData.enemy_party && jsonData.enemy_party.length > 0 && shiny_yes == 0){
-							for(i = 0; i < jsonData.enemy_party.length; i++){
-								if(jsonData.enemy_party[i].shiny){
-									shiny_yes = 1;
-								}
+						for(i = 0; i < jsonData.enemy_party.length; i++){
+							if(jsonData.enemy_party[i].shiny){
+								shiny_yes = 1;
 							}
-							if(shiny_yes){
-								msg = '✨ Battling against a shiny wild ';
+						}
+						if(shiny_yes){
+							msg = '✨ Battling against a shiny wild ';
 							for(i = 0; i < jsonData.enemy_party.length; i++){
-								msg = msg.concat(jsonData.enemy_party[i].species.name);
-								if(i < jsonData.enemy_party.length-1){
-									msg = msg.concat(' and ');
+							msg = msg.concat(jsonData.enemy_party[i].species.name);
+							if(i < jsonData.enemy_party.length-1){
+								msg = msg.concat(' and ');
 								}
 							}
 							msg = msg.concat('.');
-							}
+						}
 							
 							
 						}
@@ -595,31 +591,7 @@ module.exports = {
 						}
 						msg = "";
 					}
-				} catch(err) {
-						var errdate = new Date();
-						console.log(err+"\n"+errdate.getTime());
-					}
-					
-		 	}, updateLength);
-		var interval = setInterval (async function () {
-			 	var list = {};
-			 	try{ 
-					list = await fetch(`https://twitchplayspokemon.tv/api/run_status?`).then(list => list.json());
-					jsonData = list;
-
-					//this bit makes it know when the run time is
-					var i;
-					var time;
-					var elapsed = 0;
-					
-					var diff = {};
-				
-					diff.days    = 0
-					diff.hours   = 0
-					diff.minutes = 0
-					diff.seconds = 0
-
-					msg = "";
+msg = "";
 					curmsg = "";
 						//This is the one you're looking for. Whole updater. Every damn thing
 						for(i = allpoint; i < jsonData.events.length; i++){
@@ -736,11 +708,16 @@ module.exports = {
 							});
 						}
 
-					} catch(err) {
+
+
+
+					
+				} catch(err) {
 						var errdate = new Date();
 						console.log(err+"\n"+errdate.getTime());
 					}
-				}, updateLength);
+					//console.log('yay');
+					
+		 	}, updateLength);
 		}
 	}
-}
