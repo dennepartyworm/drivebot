@@ -451,33 +451,39 @@ module.exports = {
 						// if(testloc === ''){
 						// 	testloc.concat('Probably a contest'); //RTHE
 						// }
-						msg = '🚶 Current location: '+testloc+'.\n';
-						sendMessage(msg);
+						curmsg = '🚶 Current location: '+testloc+'.\n';
 						wherearewe = jsonData.map_name;
-						fs.appendFile(file, msg, (err) => {
+						fs.appendFile(file, curmsg, (err) => {
 							if (err) {
 									console.error(err);
 								return;
 								}
 						});
-						msg = "";
+						if(curmsg !=""){
+							sendMessage(curmsg);
+						}
+						curmsg = "";
 					}
 //Notifies when we monie
 					if(!(jsonData.money === monies)){
-						msg = '💸 We now have '+jsonData.money+' Pok\u{00E9}yen.\n';
-						sendMessage(msg);
+						curmsg = '💸 We now have '+jsonData.money+' Pok\u{00E9}yen.\n';
 						if(elitefourWIP == 1 && jsonData.money < monies){
 							elitefourWIP = 0;
 							console.log("E4 attempt "+attempts+" over");
 						}
 						monies = jsonData.money;
-						fs.appendFile(file, msg, (err) => {
+						fs.appendFile(file, curmsg, (err) => {
 							if (err) {
 									console.error(err);
 								return;
 								}
+
 						});
-						msg = "";
+						if(curmsg !=""){
+							sendMessage(curmsg);
+							
+						}
+						curmsg = "";
 					}
 
 
