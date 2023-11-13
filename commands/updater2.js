@@ -12,7 +12,7 @@ const updateLength = 60 * 1000;
 var badgepoint = 0;
 var pokepoint = 0;
 //Literally I manually set this whenever I want them to do past events. Don't code like this
-var allpoint2 = 49;
+var allpoint2 = 219;
 
 
 var trimpoint = 0;
@@ -213,6 +213,7 @@ module.exports = {
 						});
 
 						buals = jsonData.ball_count;
+					}
 
 //Detects new mon in the PC.
 //TODO: report when a mon leaves the PC
@@ -501,7 +502,7 @@ module.exports = {
 					// 	contests_won = jsonData.game_stats["Contests Won"];
 					// }
 
-//Badges. Temporary
+//Emergency badge updates for if events broke
 					// if(!(jsonData.badges === badges)){
 					// 	if(badges === 0){
 					// 		badges = jsonData.badges;
@@ -511,7 +512,7 @@ module.exports = {
 					// 		badges = jsonData.badges;
 					// 	}
 					// }
-//Caught list. Temporary
+//Emergency caught list for if events broke
 					// if(caught === []){
 					// 	caught = jsonData.caught_list;
 					// 	console.log(caught);
@@ -580,22 +581,20 @@ module.exports = {
 						}
 							
 							
-						}
-						if(!jsonData.enemy_party){
-							shiny_yes = 0;
-						}
-						if(msg !=""){
-							sendMessage(msg);
-							fs.appendFile(file, msg, (err) => {
-								if (err) {
-   									console.error(err);
-									return;
- 								}
-							});
-						}
-						msg = "";
 					}
-msg = "";
+					if(!jsonData.enemy_party){
+						shiny_yes = 0;
+					}
+					if(msg !=""){
+						sendMessage(msg);
+						fs.appendFile(file, msg, (err) => {
+							if (err) {
+   								console.error(err);
+								return;
+ 							}
+						});
+					}
+					msg = "";
 					curmsg = "";
 						//This is the one you're looking for. Whole updater. Every damn thing
 						for(i = allpoint2; i < jsonData.events.length; i++){
@@ -639,16 +638,6 @@ msg = "";
 								}
 								curmsg = '🆚 **Battle:** '+eventname+' at '+diff.days+'d '+diff.hours+'h '+diff.minutes+'m '+diff.seconds+'s.\n';
 								msg = msg.concat(curmsg);
-								//this sucks. do not code like this
-								//if a battle starts give it uhhhhh 7 min to finish the battle. after that give up
-								// if(waiting <= 6){
-								// 	await delay(1000 * 60 * 1);
-								// 	waiting++;
-								// } if(waiting > 6){
-								// 	curmsg = ':vs: **Battle:** '+jsonData.events[i].name+' at '+diff.days+'d '+diff.hours+'h '+diff.minutes+'m '+diff.seconds+'s.\n';
-								// 	msg = msg.concat(curmsg);
-								// 	waiting = 0;
-								// }
 							} else if(jsonData.events[i].group == "Blackouts"){
 								curmsg = ':regional_indicator_f: **'+jsonData.events[i].name+'** at '+diff.days+'d '+diff.hours+'h '+diff.minutes+'m '+diff.seconds+'s.\n';
 								msg = msg.concat(curmsg);
@@ -673,12 +662,6 @@ msg = "";
 							}
 							console.log(allpoint2);
 							allpoint2++;
-							// fs.writeFile(allpoint2file, allpoint2, (err) => {
-							// 			if (err) {
-   				// 							console.error(err);
-							// 				return;
- 						// 				}
-							// 		});
 
 			//if it's getting too long send the front part and shorten it
 							if(msg != ""){
