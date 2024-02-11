@@ -2,9 +2,9 @@ const { SlashCommandBuilder } = require('discord.js');
 const { authorId } = require('../config.json');
 const fs = require('node:fs');
 
-const runstart = 1699743600000; //nameless
+const runstart = 1703710800000; //inverse white
 //easy way to get the start time for a different one is here https://currentmillis.com/
-const file = "./logs/nameless_new.txt";
+const file = "./logs/invwhite.txt";
 
 const msglen = 1900;
 const updateLength = 60 * 1000;
@@ -12,7 +12,7 @@ const updateLength = 60 * 1000;
 var badgepoint = 0;
 var pokepoint = 0;
 //Literally I manually set this whenever I want them to do past events. Don't code like this
-var allpoint = 219;
+var allpoint = 0;
 
 
 var trimpoint = 0;

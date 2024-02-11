@@ -5,3 +5,6 @@ config.json
 deploy-commands.js
 undeploy-commands.js
 logs
+twitch-config.json
+screenshots
+screenshots2
